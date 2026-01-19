@@ -6,6 +6,8 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const UserRole = require('../models/userRole.model');
+const Staff = require('../models/staff.model');
+const StaffRole = require('../models/staffRole.model');
 const authConfig = require('../config/auth.config');
 const { successResponse, errorResponse } = require('../utils/responseHandler');
 const { asyncHandler } = require('../utils/errorHandler');
@@ -103,6 +105,156 @@ const AuthController = {
             token,
             refreshToken
         }, 'Login successful');
+    }),
+
+    /**
+     * Staff Login - Returns staff info with role and allowed modules
+     */
+    staffLogin: asyncHandler(async (req, res) => {
+        const { email, password } = req.body;
+
+        // Find user by email
+        const user = await User.findByEmail(email);
+        if (!user) {
+            return errorResponse(res, 'Invalid email or password', 401);
+        }
+
+        // Check if active
+        if (!user.is_active) {
+            return errorResponse(res, 'Account is deactivated. Please contact administrator.', 401);
+        }
+
+        // Verify password
+        const isValidPassword = await User.verifyPassword(password, user.password_hash);
+        if (!isValidPassword) {
+            return errorResponse(res, 'Invalid email or password', 401);
+        }
+
+        // Get linked staff record
+        const staff = await Staff.findByUserId(user.id);
+        if (!staff) {
+            return errorResponse(res, 'No staff profile linked to this account', 401);
+        }
+
+        // Get staff role with modules
+        let role = null;
+        let allowedModules = [];
+
+        if (staff.role_id) {
+            role = await StaffRole.findById(staff.role_id);
+            if (role) {
+                allowedModules = role.allowed_modules || [];
+            }
+        }
+
+        // Fallback: try to find role by staff role name
+        if (!role && staff.role) {
+            role = await StaffRole.findByName(staff.role);
+            if (role) {
+                allowedModules = role.allowed_modules || [];
+            }
+        }
+
+        // Update last login
+        await User.updateLastLogin(user.id);
+
+        // Generate token with staff info
+        const token = jwt.sign(
+            {
+                id: user.id,
+                email: user.email,
+                staffId: staff.id,
+                roleId: role?.id,
+                roleName: role?.name || staff.role
+            },
+            authConfig.secret,
+            { expiresIn: authConfig.expiresIn }
+        );
+
+        const refreshToken = jwt.sign(
+            { id: user.id },
+            authConfig.refreshSecret,
+            { expiresIn: authConfig.refreshExpiresIn }
+        );
+
+        return successResponse(res, {
+            user: {
+                id: user.id,
+                email: user.email,
+                staffId: staff.id,
+                staffName: staff.name,
+                department: staff.department_name || null,
+                role: {
+                    id: role?.id || null,
+                    name: role?.name || staff.role,
+                    allowedModules: allowedModules
+                }
+            },
+            token,
+            refreshToken
+        }, 'Login successful');
+    }),
+
+    /**
+     * Create Staff Account - Admin creates staff with user account
+     */
+    createStaffAccount: asyncHandler(async (req, res) => {
+        const { email, password, name, role_id, phone, shift, join_date, salary, address, emergency_contact, department_id } = req.body;
+
+        // Validate required fields
+        if (!email || !password || !name || !role_id) {
+            return errorResponse(res, 'Email, password, name, and role are required', 400);
+        }
+
+        // Check if email already exists
+        const existingUser = await User.findByEmail(email);
+        if (existingUser) {
+            return errorResponse(res, 'Email already registered', 409);
+        }
+
+        // Validate role exists
+        const role = await StaffRole.findById(role_id);
+        if (!role) {
+            return errorResponse(res, 'Invalid role selected', 400);
+        }
+
+        // Create user account
+        const user = await User.create({ email, password });
+
+        // Add user role (use role name as the user_role)
+        const systemRole = role.name.toLowerCase().replace(/\s+/g, '_');
+        await UserRole.addRole(user.id, systemRole);
+
+        // Create staff record
+        const staff = await Staff.create({
+            name,
+            email,
+            phone: phone || null,
+            role: role.name,
+            role_id: role.id,
+            user_id: user.id,
+            department_id: department_id || null,
+            shift: shift || 'Morning',
+            join_date: join_date || new Date().toISOString().split('T')[0],
+            salary: salary || null,
+            address: address || null,
+            emergency_contact: emergency_contact || null,
+            status: 'Active'
+        });
+
+        return successResponse(res, {
+            staff: {
+                id: staff.id,
+                staff_id: staff.staff_id,
+                name: staff.name,
+                email: staff.email,
+                role: role.name
+            },
+            user: {
+                id: user.id,
+                email: user.email
+            }
+        }, 'Staff account created successfully', 201);
     }),
 
     /**

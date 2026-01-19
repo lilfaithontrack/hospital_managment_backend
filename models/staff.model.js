@@ -113,12 +113,12 @@ const Staff = {
 
         await db.query(
             `INSERT INTO staff (
-        id, staff_id, user_id, name, role, department_id, phone, email,
+        id, staff_id, user_id, name, role, role_id, department_id, phone, email,
         shift, join_date, salary, status, address, emergency_contact
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 id, staffId, data.user_id || null, data.name, data.role,
-                data.department_id || null, data.phone, data.email,
+                data.role_id || null, data.department_id || null, data.phone, data.email,
                 data.shift || 'Morning', data.join_date, data.salary || null,
                 data.status || 'Active', data.address || null,
                 data.emergency_contact || null
@@ -128,12 +128,13 @@ const Staff = {
         return Staff.findById(id);
     },
 
+
     /**
      * Update staff
      */
     update: async (id, data) => {
         const allowedFields = [
-            'name', 'role', 'department_id', 'phone', 'email', 'shift',
+            'name', 'role', 'role_id', 'department_id', 'phone', 'email', 'shift',
             'salary', 'status', 'address', 'emergency_contact', 'user_id'
         ];
 

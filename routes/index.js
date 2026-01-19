@@ -23,6 +23,7 @@ const bloodBankRoutes = require('./bloodBank.routes');
 const pharmacyRoutes = require('./pharmacy.routes');
 const billingRoutes = require('./billing.routes');
 const roomRoutes = require('./room.routes');
+const staffRoleRoutes = require('./staffRole.routes');
 
 // Mount routes
 router.use('/auth', authRoutes);
@@ -41,6 +42,7 @@ router.use('/blood-bank', bloodBankRoutes);
 router.use('/pharmacy', pharmacyRoutes);
 router.use('/bills', billingRoutes);
 router.use('/rooms', roomRoutes);
+router.use('/staff-roles', staffRoleRoutes);
 
 // API info endpoint
 router.get('/', (req, res) => {
@@ -53,6 +55,7 @@ router.get('/', (req, res) => {
             patients: '/api/patients',
             doctors: '/api/doctors',
             staff: '/api/staff',
+            staffRoles: '/api/staff-roles',
             appointments: '/api/appointments',
             emergency: '/api/emergency',
             surgeries: '/api/surgeries',
