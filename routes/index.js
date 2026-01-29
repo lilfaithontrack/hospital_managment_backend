@@ -44,6 +44,8 @@ router.use('/bills', billingRoutes);
 router.use('/rooms', roomRoutes);
 router.use('/staff-roles', staffRoleRoutes);
 router.use('/insurance', require('./insurance.routes'));
+router.use('/ict', require('./ict.routes'));
+router.use('/security', require('./security.routes'));
 
 // API info endpoint
 router.get('/', (req, res) => {
