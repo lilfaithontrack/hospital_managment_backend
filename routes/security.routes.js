@@ -9,6 +9,8 @@ router.use(authenticate);
 // Cameras
 router.get('/cameras', SecurityController.getCameras);
 router.post('/cameras', SecurityController.createCamera);
+router.put('/cameras/:id', SecurityController.updateCamera);
+router.delete('/cameras/:id', SecurityController.deleteCamera);
 
 // Visitors
 router.get('/visitors', SecurityController.getVisitors);

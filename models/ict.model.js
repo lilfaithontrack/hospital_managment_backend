@@ -55,6 +55,10 @@ const ICTAsset = {
         await db.query(`UPDATE ict_assets SET ${fields.join(', ')} WHERE id = ?`, values);
         const [[asset]] = await db.query(`SELECT * FROM ict_assets WHERE id = ?`, [id]);
         return asset;
+    },
+    delete: async (id) => {
+        await db.query(`DELETE FROM ict_assets WHERE id = ?`, [id]);
+        return true;
     }
 };
 
@@ -107,6 +111,10 @@ const ICTTicket = {
         await db.query(`UPDATE ict_tickets SET ${fields.join(', ')} WHERE id = ?`, values);
         const [[ticket]] = await db.query(`SELECT * FROM ict_tickets WHERE id = ?`, [id]);
         return ticket;
+    },
+    delete: async (id) => {
+        await db.query(`DELETE FROM ict_tickets WHERE id = ?`, [id]);
+        return true;
     }
 };
 

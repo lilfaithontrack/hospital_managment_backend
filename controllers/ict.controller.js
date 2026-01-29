@@ -24,6 +24,12 @@ const ICTController = {
             res.json({ success: true, data: asset });
         } catch (error) { res.status(500).json({ success: false, message: error.message }); }
     },
+    deleteAsset: async (req, res) => {
+        try {
+            await ICTAsset.delete(req.params.id);
+            res.json({ success: true, message: 'Asset deleted' });
+        } catch (error) { res.status(500).json({ success: false, message: error.message }); }
+    },
 
     // --- Tickets ---
     getTickets: async (req, res) => {
@@ -44,6 +50,12 @@ const ICTController = {
             const ticket = await ICTTicket.update(req.params.id, req.body);
             if (!ticket) return res.status(404).json({ success: false, message: 'Not found' });
             res.json({ success: true, data: ticket });
+        } catch (error) { res.status(500).json({ success: false, message: error.message }); }
+    },
+    deleteTicket: async (req, res) => {
+        try {
+            await ICTTicket.delete(req.params.id);
+            res.json({ success: true, message: 'Ticket deleted' });
         } catch (error) { res.status(500).json({ success: false, message: error.message }); }
     }
 };

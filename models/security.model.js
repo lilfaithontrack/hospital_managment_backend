@@ -7,22 +7,31 @@ const db = require('../config/db.config');
 const { v4: uuidv4 } = require('uuid');
 
 const SecurityCamera = {
-    findAll: async () => {
-        const [rows] = await db.query(`SELECT * FROM security_cameras ORDER BY location`);
+    findAll: async (options = {}) => {
+        let query = `SELECT * FROM security_cameras WHERE 1=1`;
+        const params = [];
+        if (options.status) { query += ` AND status = ?`; params.push(options.status); }
+        if (options.protocol) { query += ` AND protocol = ?`; params.push(options.protocol); }
+        query += ` ORDER BY location`;
+        const [rows] = await db.query(query, params);
         return rows;
     },
     create: async (data) => {
         const id = uuidv4();
         await db.query(
-            `INSERT INTO security_cameras (id, name, location, ip_address, stream_url, model, status)
-             VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [id, data.name, data.location, data.ip_address, data.stream_url, data.model, data.status || 'Online']
+            `INSERT INTO security_cameras (id, name, location, ip_address, port, protocol, stream_url, username, password, model, firmware_version, status, maintenance_mode)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                id, data.name, data.location, data.ip_address, data.port || 554,
+                data.protocol || 'RTSP', data.stream_url, data.username, data.password,
+                data.model, data.firmware_version, data.status || 'Online', data.maintenance_mode || false
+            ]
         );
         const [[cam]] = await db.query(`SELECT * FROM security_cameras WHERE id = ?`, [id]);
         return cam;
     },
     update: async (id, data) => {
-        const allowed = ['name', 'location', 'ip_address', 'stream_url', 'status'];
+        const allowed = ['name', 'location', 'ip_address', 'port', 'protocol', 'stream_url', 'username', 'password', 'model', 'firmware_version', 'status', 'maintenance_mode'];
         const fields = [];
         const values = [];
         allowed.forEach(f => { if (data[f] !== undefined) { fields.push(`${f}=?`); values.push(data[f]); } });
@@ -31,6 +40,10 @@ const SecurityCamera = {
         await db.query(`UPDATE security_cameras SET ${fields.join(', ')} WHERE id = ?`, values);
         const [[cam]] = await db.query(`SELECT * FROM security_cameras WHERE id = ?`, [id]);
         return cam;
+    },
+    delete: async (id) => {
+        await db.query(`DELETE FROM security_cameras WHERE id = ?`, [id]);
+        return true;
     }
 };
 

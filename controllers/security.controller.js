@@ -17,6 +17,19 @@ const SecurityController = {
             res.status(201).json({ success: true, data: cam });
         } catch (error) { res.status(500).json({ success: false, message: error.message }); }
     },
+    updateCamera: async (req, res) => {
+        try {
+            const cam = await SecurityCamera.update(req.params.id, req.body);
+            if (!cam) return res.status(404).json({ success: false, message: 'Not found' });
+            res.json({ success: true, data: cam });
+        } catch (error) { res.status(500).json({ success: false, message: error.message }); }
+    },
+    deleteCamera: async (req, res) => {
+        try {
+            await SecurityCamera.delete(req.params.id);
+            res.json({ success: true, message: 'Camera deleted' });
+        } catch (error) { res.status(500).json({ success: false, message: error.message }); }
+    },
 
     // --- Visitors ---
     getVisitors: async (req, res) => {
