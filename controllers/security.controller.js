@@ -63,7 +63,11 @@ const SecurityController = {
             let files = [];
             if (req.files) files = req.files.map(f => f.filename);
 
-            const data = { ...req.body, reported_by: req.user.id, evidence_files: files };
+            if (!req.userId) {
+                return res.status(401).json({ success: false, message: 'Unauthorized: No user found' });
+            }
+
+            const data = { ...req.body, reported_by: req.userId, evidence_files: files };
             const incident = await SecurityIncident.create(data);
             res.status(201).json({ success: true, data: incident });
         } catch (error) { res.status(500).json({ success: false, message: error.message }); }

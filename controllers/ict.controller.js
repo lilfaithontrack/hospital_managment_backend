@@ -40,7 +40,10 @@ const ICTController = {
     },
     createTicket: async (req, res) => {
         try {
-            const ticketData = { ...req.body, reported_by: req.user.id }; // Assuming auth
+            if (!req.userId) {
+                return res.status(401).json({ success: false, message: 'Unauthorized: No user found' });
+            }
+            const ticketData = { ...req.body, reported_by: req.userId };
             const ticket = await ICTTicket.create(ticketData);
             res.status(201).json({ success: true, data: ticket });
         } catch (error) { res.status(500).json({ success: false, message: error.message }); }
