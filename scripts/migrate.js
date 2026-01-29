@@ -7,8 +7,8 @@ require('dotenv').config();
 const db = require('../config/db.config');
 
 const tables = [
-    // Users & Authentication
-    `CREATE TABLE IF NOT EXISTS users (
+  // Users & Authentication
+  `CREATE TABLE IF NOT EXISTS users (
     id VARCHAR(36) PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
@@ -18,7 +18,7 @@ const tables = [
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   )`,
 
-    `CREATE TABLE IF NOT EXISTS user_roles (
+  `CREATE TABLE IF NOT EXISTS user_roles (
     id VARCHAR(36) PRIMARY KEY,
     user_id VARCHAR(36) NOT NULL,
     role ENUM('admin', 'doctor', 'nurse', 'receptionist', 'pharmacist', 'lab_technician', 'radiologist', 'accountant') NOT NULL,
@@ -26,8 +26,8 @@ const tables = [
     UNIQUE KEY unique_user_role (user_id, role)
   )`,
 
-    // Departments
-    `CREATE TABLE IF NOT EXISTS departments (
+  // Departments
+  `CREATE TABLE IF NOT EXISTS departments (
     id VARCHAR(36) PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
     description TEXT,
@@ -35,8 +35,8 @@ const tables = [
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`,
 
-    // Patients
-    `CREATE TABLE IF NOT EXISTS patients (
+  // Patients
+  `CREATE TABLE IF NOT EXISTS patients (
     id VARCHAR(36) PRIMARY KEY,
     patient_id VARCHAR(20) UNIQUE NOT NULL,
     name VARCHAR(255) NOT NULL,
@@ -59,8 +59,8 @@ const tables = [
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   )`,
 
-    // Doctors
-    `CREATE TABLE IF NOT EXISTS doctors (
+  // Doctors
+  `CREATE TABLE IF NOT EXISTS doctors (
     id VARCHAR(36) PRIMARY KEY,
     doctor_id VARCHAR(20) UNIQUE NOT NULL,
     user_id VARCHAR(36),
@@ -85,8 +85,8 @@ const tables = [
     FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL
   )`,
 
-    // Staff
-    `CREATE TABLE IF NOT EXISTS staff (
+  // Staff
+  `CREATE TABLE IF NOT EXISTS staff (
     id VARCHAR(36) PRIMARY KEY,
     staff_id VARCHAR(20) UNIQUE NOT NULL,
     user_id VARCHAR(36),
@@ -107,8 +107,8 @@ const tables = [
     FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL
   )`,
 
-    // Appointments
-    `CREATE TABLE IF NOT EXISTS appointments (
+  // Appointments
+  `CREATE TABLE IF NOT EXISTS appointments (
     id VARCHAR(36) PRIMARY KEY,
     appointment_id VARCHAR(20) UNIQUE NOT NULL,
     patient_id VARCHAR(36) NOT NULL,
@@ -130,8 +130,8 @@ const tables = [
     FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE
   )`,
 
-    // Wards
-    `CREATE TABLE IF NOT EXISTS wards (
+  // Wards
+  `CREATE TABLE IF NOT EXISTS wards (
     id VARCHAR(36) PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     type ENUM('General', 'ICU', 'Pediatric', 'Maternity', 'Surgical', 'Emergency', 'Psychiatric') NOT NULL,
@@ -142,8 +142,8 @@ const tables = [
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`,
 
-    // Beds
-    `CREATE TABLE IF NOT EXISTS beds (
+  // Beds
+  `CREATE TABLE IF NOT EXISTS beds (
     id VARCHAR(36) PRIMARY KEY,
     bed_number VARCHAR(20) NOT NULL,
     ward_id VARCHAR(36) NOT NULL,
@@ -154,8 +154,8 @@ const tables = [
     FOREIGN KEY (ward_id) REFERENCES wards(id) ON DELETE CASCADE
   )`,
 
-    // Rooms
-    `CREATE TABLE IF NOT EXISTS rooms (
+  // Rooms
+  `CREATE TABLE IF NOT EXISTS rooms (
     id VARCHAR(36) PRIMARY KEY,
     room_number VARCHAR(20) UNIQUE NOT NULL,
     room_type ENUM('Private', 'Semi-Private', 'General', 'Deluxe', 'Suite', 'ICU') NOT NULL,
@@ -172,8 +172,8 @@ const tables = [
     FOREIGN KEY (ward_id) REFERENCES wards(id) ON DELETE SET NULL
   )`,
 
-    // Emergency Cases
-    `CREATE TABLE IF NOT EXISTS emergency_cases (
+  // Emergency Cases
+  `CREATE TABLE IF NOT EXISTS emergency_cases (
     id VARCHAR(36) PRIMARY KEY,
     case_id VARCHAR(20) UNIQUE NOT NULL,
     patient_id VARCHAR(36),
@@ -201,8 +201,8 @@ const tables = [
     FOREIGN KEY (assigned_nurse_id) REFERENCES staff(id) ON DELETE SET NULL
   )`,
 
-    // Operating Rooms
-    `CREATE TABLE IF NOT EXISTS operating_rooms (
+  // Operating Rooms
+  `CREATE TABLE IF NOT EXISTS operating_rooms (
     id VARCHAR(36) PRIMARY KEY,
     room_number VARCHAR(20) UNIQUE NOT NULL,
     name VARCHAR(100),
@@ -211,8 +211,8 @@ const tables = [
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`,
 
-    // Surgeries
-    `CREATE TABLE IF NOT EXISTS surgeries (
+  // Surgeries
+  `CREATE TABLE IF NOT EXISTS surgeries (
     id VARCHAR(36) PRIMARY KEY,
     surgery_id VARCHAR(20) UNIQUE NOT NULL,
     patient_id VARCHAR(36) NOT NULL,
@@ -241,8 +241,8 @@ const tables = [
     FOREIGN KEY (operating_room_id) REFERENCES operating_rooms(id) ON DELETE SET NULL
   )`,
 
-    // ICU Beds
-    `CREATE TABLE IF NOT EXISTS icu_beds (
+  // ICU Beds
+  `CREATE TABLE IF NOT EXISTS icu_beds (
     id VARCHAR(36) PRIMARY KEY,
     bed_number VARCHAR(20) UNIQUE NOT NULL,
     equipment JSON,
@@ -250,8 +250,8 @@ const tables = [
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`,
 
-    // ICU Patients
-    `CREATE TABLE IF NOT EXISTS icu_patients (
+  // ICU Patients
+  `CREATE TABLE IF NOT EXISTS icu_patients (
     id VARCHAR(36) PRIMARY KEY,
     admission_id VARCHAR(20) UNIQUE NOT NULL,
     patient_id VARCHAR(36) NOT NULL,
@@ -277,8 +277,8 @@ const tables = [
     FOREIGN KEY (attending_doctor_id) REFERENCES doctors(id) ON DELETE SET NULL
   )`,
 
-    // ICU Vitals Log
-    `CREATE TABLE IF NOT EXISTS icu_vitals_log (
+  // ICU Vitals Log
+  `CREATE TABLE IF NOT EXISTS icu_vitals_log (
     id VARCHAR(36) PRIMARY KEY,
     icu_patient_id VARCHAR(36) NOT NULL,
     recorded_at DATETIME NOT NULL,
@@ -295,8 +295,8 @@ const tables = [
     FOREIGN KEY (icu_patient_id) REFERENCES icu_patients(id) ON DELETE CASCADE
   )`,
 
-    // OPD Visits
-    `CREATE TABLE IF NOT EXISTS opd_visits (
+  // OPD Visits
+  `CREATE TABLE IF NOT EXISTS opd_visits (
     id VARCHAR(36) PRIMARY KEY,
     visit_id VARCHAR(20) UNIQUE NOT NULL,
     patient_id VARCHAR(36) NOT NULL,
@@ -325,8 +325,8 @@ const tables = [
     FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL
   )`,
 
-    // IPD Admissions
-    `CREATE TABLE IF NOT EXISTS ipd_admissions (
+  // IPD Admissions
+  `CREATE TABLE IF NOT EXISTS ipd_admissions (
     id VARCHAR(36) PRIMARY KEY,
     admission_id VARCHAR(20) UNIQUE NOT NULL,
     patient_id VARCHAR(36) NOT NULL,
@@ -354,8 +354,8 @@ const tables = [
     FOREIGN KEY (attending_doctor_id) REFERENCES doctors(id) ON DELETE SET NULL
   )`,
 
-    // Lab Test Catalog
-    `CREATE TABLE IF NOT EXISTS lab_test_catalog (
+  // Lab Test Catalog
+  `CREATE TABLE IF NOT EXISTS lab_test_catalog (
     id VARCHAR(36) PRIMARY KEY,
     test_code VARCHAR(20) UNIQUE NOT NULL,
     test_name VARCHAR(255) NOT NULL,
@@ -369,8 +369,8 @@ const tables = [
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`,
 
-    // Lab Tests
-    `CREATE TABLE IF NOT EXISTS lab_tests (
+  // Lab Tests
+  `CREATE TABLE IF NOT EXISTS lab_tests (
     id VARCHAR(36) PRIMARY KEY,
     test_id VARCHAR(20) UNIQUE NOT NULL,
     patient_id VARCHAR(36) NOT NULL,
@@ -402,8 +402,8 @@ const tables = [
     FOREIGN KEY (test_catalog_id) REFERENCES lab_test_catalog(id) ON DELETE SET NULL
   )`,
 
-    // Radiology Equipment
-    `CREATE TABLE IF NOT EXISTS radiology_equipment (
+  // Radiology Equipment
+  `CREATE TABLE IF NOT EXISTS radiology_equipment (
     id VARCHAR(36) PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     type ENUM('X-Ray', 'CT Scan', 'MRI', 'Ultrasound', 'Mammography', 'Fluoroscopy', 'PET Scan') NOT NULL,
@@ -414,8 +414,8 @@ const tables = [
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`,
 
-    // Radiology Orders
-    `CREATE TABLE IF NOT EXISTS radiology_orders (
+  // Radiology Orders
+  `CREATE TABLE IF NOT EXISTS radiology_orders (
     id VARCHAR(36) PRIMARY KEY,
     order_id VARCHAR(20) UNIQUE NOT NULL,
     patient_id VARCHAR(36) NOT NULL,
@@ -450,8 +450,8 @@ const tables = [
     FOREIGN KEY (equipment_id) REFERENCES radiology_equipment(id) ON DELETE SET NULL
   )`,
 
-    // Blood Inventory
-    `CREATE TABLE IF NOT EXISTS blood_inventory (
+  // Blood Inventory
+  `CREATE TABLE IF NOT EXISTS blood_inventory (
     id VARCHAR(36) PRIMARY KEY,
     blood_group ENUM('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-') NOT NULL,
     component ENUM('Whole Blood', 'Packed RBC', 'Platelets', 'Fresh Frozen Plasma', 'Cryoprecipitate') NOT NULL,
@@ -462,8 +462,8 @@ const tables = [
     UNIQUE KEY blood_component (blood_group, component)
   )`,
 
-    // Blood Donations
-    `CREATE TABLE IF NOT EXISTS blood_donations (
+  // Blood Donations
+  `CREATE TABLE IF NOT EXISTS blood_donations (
     id VARCHAR(36) PRIMARY KEY,
     donation_id VARCHAR(20) UNIQUE NOT NULL,
     donor_name VARCHAR(255) NOT NULL,
@@ -483,8 +483,8 @@ const tables = [
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`,
 
-    // Blood Requests
-    `CREATE TABLE IF NOT EXISTS blood_requests (
+  // Blood Requests
+  `CREATE TABLE IF NOT EXISTS blood_requests (
     id VARCHAR(36) PRIMARY KEY,
     request_id VARCHAR(20) UNIQUE NOT NULL,
     patient_id VARCHAR(36) NOT NULL,
@@ -506,16 +506,16 @@ const tables = [
     FOREIGN KEY (requesting_doctor_id) REFERENCES doctors(id) ON DELETE SET NULL
   )`,
 
-    // Pharmacy Categories
-    `CREATE TABLE IF NOT EXISTS pharmacy_categories (
+  // Pharmacy Categories
+  `CREATE TABLE IF NOT EXISTS pharmacy_categories (
     id VARCHAR(36) PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`,
 
-    // Pharmacy Items
-    `CREATE TABLE IF NOT EXISTS pharmacy_items (
+  // Pharmacy Items
+  `CREATE TABLE IF NOT EXISTS pharmacy_items (
     id VARCHAR(36) PRIMARY KEY,
     item_code VARCHAR(50) UNIQUE NOT NULL,
     name VARCHAR(255) NOT NULL,
@@ -545,8 +545,8 @@ const tables = [
     FOREIGN KEY (category_id) REFERENCES pharmacy_categories(id) ON DELETE SET NULL
   )`,
 
-    // Pharmacy Transactions
-    `CREATE TABLE IF NOT EXISTS pharmacy_transactions (
+  // Pharmacy Transactions
+  `CREATE TABLE IF NOT EXISTS pharmacy_transactions (
     id VARCHAR(36) PRIMARY KEY,
     transaction_id VARCHAR(20) NOT NULL,
     item_id VARCHAR(36) NOT NULL,
@@ -564,8 +564,8 @@ const tables = [
     FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE SET NULL
   )`,
 
-    // Billing Items
-    `CREATE TABLE IF NOT EXISTS billing_items (
+  // Billing Items
+  `CREATE TABLE IF NOT EXISTS billing_items (
     id VARCHAR(36) PRIMARY KEY,
     item_code VARCHAR(50) UNIQUE NOT NULL,
     name VARCHAR(255) NOT NULL,
@@ -577,8 +577,8 @@ const tables = [
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`,
 
-    // Bills
-    `CREATE TABLE IF NOT EXISTS bills (
+  // Bills
+  `CREATE TABLE IF NOT EXISTS bills (
     id VARCHAR(36) PRIMARY KEY,
     bill_number VARCHAR(20) UNIQUE NOT NULL,
     patient_id VARCHAR(36) NOT NULL,
@@ -604,8 +604,8 @@ const tables = [
     FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE
   )`,
 
-    // Bill Items
-    `CREATE TABLE IF NOT EXISTS bill_items (
+  // Bill Items
+  `CREATE TABLE IF NOT EXISTS bill_items (
     id VARCHAR(36) PRIMARY KEY,
     bill_id VARCHAR(36) NOT NULL,
     billing_item_id VARCHAR(36),
@@ -621,8 +621,8 @@ const tables = [
     FOREIGN KEY (billing_item_id) REFERENCES billing_items(id) ON DELETE SET NULL
   )`,
 
-    // Payments
-    `CREATE TABLE IF NOT EXISTS payments (
+  // Payments
+  `CREATE TABLE IF NOT EXISTS payments (
     id VARCHAR(36) PRIMARY KEY,
     payment_id VARCHAR(20) UNIQUE NOT NULL,
     bill_id VARCHAR(36) NOT NULL,
@@ -639,8 +639,8 @@ const tables = [
     FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE
   )`,
 
-    // Shifts
-    `CREATE TABLE IF NOT EXISTS shifts (
+  // Shifts
+  `CREATE TABLE IF NOT EXISTS shifts (
     id VARCHAR(36) PRIMARY KEY,
     staff_id VARCHAR(36) NOT NULL,
     shift_date DATE NOT NULL,
@@ -651,42 +651,158 @@ const tables = [
     notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (staff_id) REFERENCES staff(id) ON DELETE CASCADE
+  )`,
+
+  // Insurance Providers
+  `CREATE TABLE IF NOT EXISTS insurance_providers (
+    id VARCHAR(36) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    code VARCHAR(50) UNIQUE NOT NULL,
+    contact_number VARCHAR(20),
+    email VARCHAR(255),
+    address TEXT,
+    coverage_details TEXT,
+    status ENUM('Active', 'Inactive') DEFAULT 'Active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  )`,
+
+  // Insurance Claims
+  `CREATE TABLE IF NOT EXISTS insurance_claims (
+    id VARCHAR(36) PRIMARY KEY,
+    claim_number VARCHAR(50) UNIQUE NOT NULL,
+    bill_id VARCHAR(36) NOT NULL,
+    patient_id VARCHAR(36) NOT NULL,
+    insurance_provider_id VARCHAR(36) NOT NULL,
+    amount DECIMAL(12,2) NOT NULL,
+    status ENUM('Pending', 'Approved', 'Rejected') DEFAULT 'Pending',
+    documents JSON,
+    notes TEXT,
+    admin_notes TEXT,
+    created_by VARCHAR(36),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (bill_id) REFERENCES bills(id) ON DELETE CASCADE,
+    FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE,
+    FOREIGN KEY (insurance_provider_id) REFERENCES insurance_providers(id) ON DELETE CASCADE
+  )`,
+
+  // ICT Assets
+  `CREATE TABLE IF NOT EXISTS ict_assets (
+    id VARCHAR(36) PRIMARY KEY,
+    type VARCHAR(50) NOT NULL,
+    brand VARCHAR(100),
+    model VARCHAR(100),
+    serial_number VARCHAR(100) UNIQUE,
+    assigned_to VARCHAR(100),
+    status ENUM('Active', 'Repair', 'Retired', 'Storage') DEFAULT 'Active',
+    purchase_date DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  )`,
+
+  // ICT Tickets
+  `CREATE TABLE IF NOT EXISTS ict_tickets (
+    id VARCHAR(36) PRIMARY KEY,
+    ticket_id VARCHAR(20) UNIQUE NOT NULL,
+    reported_by VARCHAR(36) NOT NULL,
+    issue_type VARCHAR(100) NOT NULL,
+    priority ENUM('High', 'Medium', 'Low') DEFAULT 'Medium',
+    status ENUM('Open', 'In Progress', 'Resolved', 'Closed') DEFAULT 'Open',
+    assigned_tech VARCHAR(36),
+    description TEXT,
+    resolution_notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (reported_by) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (assigned_tech) REFERENCES users(id) ON DELETE SET NULL
+  )`,
+
+  // Security Cameras
+  `CREATE TABLE IF NOT EXISTS security_cameras (
+    id VARCHAR(36) PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    location VARCHAR(255),
+    ip_address VARCHAR(50),
+    stream_url VARCHAR(500),
+    model VARCHAR(100),
+    status ENUM('Online', 'Offline', 'Maintenance') DEFAULT 'Online',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  )`,
+
+  // Security Visitors
+  `CREATE TABLE IF NOT EXISTS security_visitors (
+    id VARCHAR(36) PRIMARY KEY,
+    visitor_name VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    purpose TEXT,
+    visit_person VARCHAR(255),
+    check_in_time DATETIME NOT NULL,
+    check_out_time DATETIME,
+    id_proof_number VARCHAR(100),
+    status ENUM('Checked In', 'Checked Out') DEFAULT 'Checked In',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`,
+
+  // Security Incidents
+  `CREATE TABLE IF NOT EXISTS security_incidents (
+    id VARCHAR(36) PRIMARY KEY,
+    incident_type VARCHAR(100) NOT NULL,
+    location VARCHAR(255),
+    severity ENUM('Critical', 'Major', 'Minor') DEFAULT 'Minor',
+    reported_by VARCHAR(36),
+    description TEXT,
+    actions_taken TEXT,
+    evidence_files JSON,
+    status ENUM('Open', 'Closed', 'Under Investigation') DEFAULT 'Open',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (reported_by) REFERENCES users(id) ON DELETE SET NULL
   )`
 ];
 
 async function migrate() {
-    console.log('🔄 Starting database migration...\n');
+  console.log('🔄 Starting database migration...\n');
 
-    try {
-        // Test connection
-        const connected = await db.testConnection();
-        if (!connected) {
-            console.error('❌ Could not connect to database. Please check your configuration.');
-            process.exit(1);
-        }
-
-        // Create tables
-        for (let i = 0; i < tables.length; i++) {
-            const sql = tables[i];
-            const tableName = sql.match(/CREATE TABLE IF NOT EXISTS (\w+)/)?.[1] || 'unknown';
-
-            try {
-                await db.query(sql);
-                console.log(`✅ Created table: ${tableName}`);
-            } catch (error) {
-                console.error(`❌ Error creating ${tableName}:`, error.message);
-            }
-        }
-
-        console.log('\n✅ Migration completed successfully!');
-        console.log('📋 Total tables created:', tables.length);
-
-    } catch (error) {
-        console.error('❌ Migration failed:', error.message);
-        process.exit(1);
+  try {
+    // Test connection
+    const connected = await db.testConnection();
+    if (!connected) {
+      console.error('❌ Could not connect to database. Please check your configuration.');
+      process.exit(1);
     }
 
-    process.exit(0);
+    // Create tables
+    for (let i = 0; i < tables.length; i++) {
+      const sql = tables[i];
+      const tableName = sql.match(/CREATE TABLE IF NOT EXISTS (\w+)/)?.[1] || 'unknown';
+
+      try {
+        await db.query(sql);
+        console.log(`✅ Created table: ${tableName}`);
+      } catch (error) {
+        console.error(`❌ Error creating ${tableName}:`, error.message);
+      }
+    }
+
+    console.log('\n✅ Migration completed successfully!');
+    console.log('📋 Total tables created:', tables.length);
+
+    console.log('\n✅ Migration completed successfully!');
+    console.log('📋 Total tables created:', tables.length);
+
+  } catch (error) {
+    console.error('❌ Migration failed:', error.message);
+    if (require.main === module) process.exit(1);
+    throw error;
+  }
+
+  if (require.main === module) process.exit(0);
 }
 
-migrate();
+if (require.main === module) {
+  migrate();
+}
+
+module.exports = migrate;

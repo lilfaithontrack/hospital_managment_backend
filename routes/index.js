@@ -43,6 +43,7 @@ router.use('/pharmacy', pharmacyRoutes);
 router.use('/bills', billingRoutes);
 router.use('/rooms', roomRoutes);
 router.use('/staff-roles', staffRoleRoutes);
+router.use('/insurance', require('./insurance.routes'));
 
 // API info endpoint
 router.get('/', (req, res) => {

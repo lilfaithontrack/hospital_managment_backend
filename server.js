@@ -7,6 +7,7 @@ const app = require('./app');
 const db = require('./config/db.config');
 const fs = require('fs');
 const path = require('path');
+const migrate = require('./scripts/migrate');
 
 const PORT = process.env.PORT || 5000;
 
@@ -22,6 +23,12 @@ const startServer = async () => {
     try {
         // Test database connection
         const dbConnected = await db.testConnection();
+
+        if (dbConnected) {
+            // Run automatic migrations
+            console.log('🔄 Running automatic migrations...');
+            await migrate();
+        }
 
         if (!dbConnected) {
             console.error('❌ Failed to connect to database. Please check your configuration.');
